@@ -4,149 +4,109 @@ static int16_t x_axis_max = 0, x_axis_min = 0, y_axis_max = 0, y_axis_min = 0, z
 static uint8_t x_enable_offset = 0, y_enable_offset = 0, z_enable_offset = 0;
 
 
-void QMC_x_calib_rst(void)
-{
-	x_axis_max = 0;
-	x_axis_min = 0;
-}
-void QMC_y_calib_rst(void)
-{
-	y_axis_max = 0;
-	y_axis_min = 0;
-}
-void QMC_z_calib_rst(void)
-{
-	z_axis_max = 0;
-	z_axis_min = 0;
-}
-void QMC_x_enbl_ofst(void)
-{
-	x_enable_offset = 1;
-}
-void QMC_x_dsbl_ofst(void)
-{
-	x_enable_offset = 0;
-}
-void QMC_y_enbl_ofst(void)
-{
-	y_enable_offset = 1;
-}
-void QMC_y_dsbl_ofst(void)
-{
-	y_enable_offset = 0;
-}
-void QMC_z_enbl_ofst(void)
-{
-	z_enable_offset = 1;
-}
-void QMC_z_dsbl_ofst(void)
-{
-	z_enable_offset = 0;
-}
-
 void QMC_filter(int16_t *x_axis, int16_t *y_axis, int16_t *z_axis)
 {
-	static uint8_t counter = 0;
-	static int16_t FIFO[3][5] = {0};
-	if (counter == 0)
-	{
-		FIFO[0][0] = *x_axis;
-		FIFO[1][0] = *y_axis;
-		FIFO[2][0] = *z_axis;
-		*x_axis = FIFO[0][0];
-		*y_axis = FIFO[1][0];
-		*z_axis = FIFO[2][0];
-		counter++;
-	}
-	else if (counter == 1)
-	{
-		FIFO[0][1] = *x_axis;
-		FIFO[1][1] = *y_axis;
-		FIFO[2][1] = *z_axis;
-		*x_axis = (FIFO[0][0] + FIFO[0][1]) / 2;
-		*y_axis = (FIFO[1][0] + FIFO[1][1]) / 2;
-		*z_axis = (FIFO[2][0] + FIFO[2][1]) / 2;
-		counter++;
-	}
-	else if (counter == 2)
-	{
-		FIFO[0][2] = *x_axis;
-		FIFO[1][2] = *y_axis;
-		FIFO[2][2] = *z_axis;
-		*x_axis = (FIFO[0][0] + FIFO[0][1] + FIFO[0][2]) / 3;
-		*y_axis = (FIFO[1][0] + FIFO[1][1] + FIFO[1][2]) / 3;
-		*z_axis = (FIFO[2][0] + FIFO[2][1] + FIFO[2][2]) / 3;
-		counter++;
-	}
-	else if (counter == 3)
-	{
-		FIFO[0][3] = *x_axis;
-		FIFO[1][3] = *y_axis;
-		FIFO[2][3] = *z_axis;
-		*x_axis = (FIFO[0][0] + FIFO[0][1] + FIFO[0][2] + FIFO[0][3]) / 4;
-		*y_axis = (FIFO[1][0] + FIFO[1][1] + FIFO[1][2] + FIFO[1][3]) / 4;
-		*z_axis = (FIFO[2][0] + FIFO[2][1] + FIFO[2][2] + FIFO[2][3]) / 4;
-		counter++;
-	}
-	else if (counter == 4)
-	{
-		FIFO[0][4] = *x_axis;
-		FIFO[1][4] = *y_axis;
-		FIFO[2][4] = *z_axis;
-		*x_axis = (FIFO[0][0] + FIFO[0][1] + FIFO[0][2] + FIFO[0][3] + FIFO[0][4]) / 5;
-		*y_axis = (FIFO[1][0] + FIFO[1][1] + FIFO[1][2] + FIFO[1][3] + FIFO[1][4]) / 5;
-		*z_axis = (FIFO[2][0] + FIFO[2][1] + FIFO[2][2] + FIFO[2][3] + FIFO[2][4]) / 5;
-		counter++;
-	}
-	else if (counter == 5)
-	{
-		FIFO[0][0] = FIFO[0][1];
-		FIFO[0][1] = FIFO[0][2];
-		FIFO[0][2] = FIFO[0][3];
-		FIFO[0][3] = FIFO[0][4];
-		FIFO[0][4] = *x_axis;
+  static uint8_t counter = 0;
+  static int16_t FIFO[3][5] = {0};
+  if (counter == 0)
+  {
+    FIFO[0][0] = *x_axis;
+    FIFO[1][0] = *y_axis;
+    FIFO[2][0] = *z_axis;
+    *x_axis = FIFO[0][0];
+    *y_axis = FIFO[1][0];
+    *z_axis = FIFO[2][0];	
+    counter++;
+  }
+  else if (counter == 1)
+  {
+    FIFO[0][1] = *x_axis;
+    FIFO[1][1] = *y_axis;
+    FIFO[2][1] = *z_axis;
+    *x_axis = (FIFO[0][0] + FIFO[0][1]) / 2;
+    *y_axis = (FIFO[1][0] + FIFO[1][1]) / 2;
+    *z_axis = (FIFO[2][0] + FIFO[2][1]) / 2;
+    counter++;
+  }
+  else if (counter == 2)
+  {
+    FIFO[0][2] = *x_axis;
+    FIFO[1][2] = *y_axis;
+    FIFO[2][2] = *z_axis;
+    *x_axis = (FIFO[0][0] + FIFO[0][1] + FIFO[0][2]) / 3;
+    *y_axis = (FIFO[1][0] + FIFO[1][1] + FIFO[1][2]) / 3;
+    *z_axis = (FIFO[2][0] + FIFO[2][1] + FIFO[2][2]) / 3;
+    counter++;
+  }
+  else if (counter == 3)
+  {
+    FIFO[0][3] = *x_axis;
+    FIFO[1][3] = *y_axis;
+    FIFO[2][3] = *z_axis;
+    *x_axis = (FIFO[0][0] + FIFO[0][1] + FIFO[0][2] + FIFO[0][3]) / 4;
+    *y_axis = (FIFO[1][0] + FIFO[1][1] + FIFO[1][2] + FIFO[1][3]) / 4;
+    *z_axis = (FIFO[2][0] + FIFO[2][1] + FIFO[2][2] + FIFO[2][3]) / 4;
+    counter++;
+  }
+  else if (counter == 4)
+  {
+    FIFO[0][4] = *x_axis;
+    FIFO[1][4] = *y_axis;
+    FIFO[2][4] = *z_axis;
+    *x_axis = (FIFO[0][0] + FIFO[0][1] + FIFO[0][2] + FIFO[0][3] + FIFO[0][4]) / 5;
+    *y_axis = (FIFO[1][0] + FIFO[1][1] + FIFO[1][2] + FIFO[1][3] + FIFO[1][4]) / 5;
+    *z_axis = (FIFO[2][0] + FIFO[2][1] + FIFO[2][2] + FIFO[2][3] + FIFO[2][4]) / 5;
+    counter++;
+  }
+  else if (counter == 5)
+  {
+    FIFO[0][0] = FIFO[0][1];
+    FIFO[0][1] = FIFO[0][2];
+    FIFO[0][2] = FIFO[0][3];
+    FIFO[0][3] = FIFO[0][4];
+    FIFO[0][4] = *x_axis;
 
-		FIFO[1][0] = FIFO[1][1];
-		FIFO[1][1] = FIFO[1][2];
-		FIFO[1][2] = FIFO[1][3];
-		FIFO[1][3] = FIFO[1][4];
-		FIFO[1][4] = *y_axis;
+    FIFO[1][0] = FIFO[1][1];
+    FIFO[1][1] = FIFO[1][2];
+    FIFO[1][2] = FIFO[1][3];
+    FIFO[1][3] = FIFO[1][4];
+    FIFO[1][4] = *y_axis;
 
-		FIFO[2][0] = FIFO[2][1];
-		FIFO[2][1] = FIFO[2][2];
-		FIFO[2][2] = FIFO[2][3];
-		FIFO[2][3] = FIFO[2][4];
-		FIFO[2][4] = *z_axis;
+    FIFO[2][0] = FIFO[2][1];
+    FIFO[2][1] = FIFO[2][2];
+    FIFO[2][2] = FIFO[2][3];
+    FIFO[2][3] = FIFO[2][4];
+    FIFO[2][4] = *z_axis;
 
-		*x_axis = (FIFO[0][0] + FIFO[0][1] + FIFO[0][2] + FIFO[0][3] + FIFO[0][4]) / 5;
-		*y_axis = (FIFO[1][0] + FIFO[1][1] + FIFO[1][2] + FIFO[1][3] + FIFO[1][4]) / 5;
-		*z_axis = (FIFO[2][0] + FIFO[2][1] + FIFO[2][2] + FIFO[2][3] + FIFO[2][4]) / 5;
-	}
+    *x_axis = (FIFO[0][0] + FIFO[0][1] + FIFO[0][2] + FIFO[0][3] + FIFO[0][4]) / 5;
+    *y_axis = (FIFO[1][0] + FIFO[1][1] + FIFO[1][2] + FIFO[1][3] + FIFO[1][4]) / 5;
+    *z_axis = (FIFO[2][0] + FIFO[2][1] + FIFO[2][2] + FIFO[2][3] + FIFO[2][4]) / 5;
+  }
 }
 void QMC_calibration(int16_t *x_axis, int16_t *y_axis, int16_t *z_axis, int16_t *max_min_buffer)
 {
-	if (x_axis_max < *x_axis)
-	x_axis_max = *x_axis;
-	if (x_axis_min > *x_axis)
-	x_axis_min = *x_axis;
-	if (y_axis_max < *y_axis)
-	y_axis_max = *y_axis;
-	if (y_axis_min > *y_axis)
-	y_axis_min = *y_axis;
-	if (z_axis_max < *z_axis)
-	z_axis_max = *z_axis;
-	if (z_axis_min > *z_axis)
-	z_axis_min = *z_axis;
-	max_min_buffer[0] = x_axis_max;
-	max_min_buffer[1] = x_axis_min;
-	max_min_buffer[2] = y_axis_max;
-	max_min_buffer[3] = y_axis_min;
-	max_min_buffer[4] = z_axis_max;
-	max_min_buffer[5] = z_axis_min;
+  if (x_axis_max < *x_axis)
+    x_axis_max = *x_axis;
+  if (x_axis_min > *x_axis)
+    x_axis_min = *x_axis;
+  if (y_axis_max < *y_axis)
+    y_axis_max = *y_axis;
+  if (y_axis_min > *y_axis)
+    y_axis_min = *y_axis;
+  if (z_axis_max < *z_axis)
+    z_axis_max = *z_axis;
+  if (z_axis_min > *z_axis)
+    z_axis_min = *z_axis;
+  max_min_buffer[0] = x_axis_max;
+  max_min_buffer[1] = x_axis_min;
+  max_min_buffer[2] = y_axis_max;
+  max_min_buffer[3] = y_axis_min;
+  max_min_buffer[4] = z_axis_max;
+  max_min_buffer[5] = z_axis_min;	
 }
 void QMC_soft_reset(void)
 {
-	I2C_master_transmit_data(QMC_ADDRESS,QMC_CONTOL2_REG,QMC_SOFT_RESET);
+  I2C_master_transmit_data(QMC_ADDRESS,QMC_CONTOL2_REG,QMC_SOFT_RESET);
 }
 void QMC_init(uint8_t OSR, uint8_t RNG, uint8_t ODR, uint8_t MODE)
 {
